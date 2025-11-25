@@ -179,5 +179,80 @@ public class Grafo {
         }
     }
 
+    /**
+     * Dijkstra: encuentra la ruta mínima en tiempo desde origen a destino
+     * Si hay empate en tiempo, minimiza precio
+     * Retorna el itinerario (lista de ciudades) y la información de las aristas
+     */
+    public Itinerario dijkstra(Ciudad origen, Ciudad destino) {
+        Map<Ciudad, NodoDijkstra> distancias = new HashMap<>();
+        PriorityQueue<NodoDijkstra> cola = new PriorityQueue<>();
+        Set<Ciudad> visitados = new HashSet<>();
+
+        // Inicializar
+        for (Ciudad ciudad : getCiudades()) {
+            distancias.put(ciudad, new NodoDijkstra(ciudad, Double.MAX_VALUE, Double.MAX_VALUE, null, null));
+        }
+
+        NodoDijkstra nodoOrigen = new NodoDijkstra(origen, 0, 0, null, null);
+        distancias.put(origen, nodoOrigen);
+        cola.offer(nodoOrigen);
+
+        while (!cola.isEmpty()) {
+            NodoDijkstra actual = cola.poll();
+
+            if (visitados.contains(actual.ciudad))
+                continue;
+            visitados.add(actual.ciudad);
+
+            if (actual.ciudad.equals(destino)) {
+                // Reconstruir camino
+                return reconstruirItinerario(actual);
+            }
+
+            for (Arista arista : getAdyacentes(actual.ciudad)) {
+                Ciudad vecino = arista.getDestino();
+
+                if (visitados.contains(vecino))
+                    continue;
+
+                double nuevoTiempo = actual.tiempo + arista.getTiempo();
+                double nuevoPrecio = actual.precio + arista.getPrecioBase();
+
+                NodoDijkstra nodoVecino = distancias.get(vecino);
+
+                // Comparar: primero tiempo, luego precio
+                if (nuevoTiempo < nodoVecino.tiempo ||
+                        (nuevoTiempo == nodoVecino.tiempo && nuevoPrecio < nodoVecino.precio)) {
+
+                    NodoDijkstra nuevoNodo = new NodoDijkstra(vecino, nuevoTiempo, nuevoPrecio, actual, arista);
+                    distancias.put(vecino, nuevoNodo);
+                    cola.offer(nuevoNodo);
+                }
+            }
+        }
+
+        return null; // No hay camino
+    }
+
+    /**
+     * Reconstruye el itinerario desde el nodo destino
+     */
+    private Itinerario reconstruirItinerario(NodoDijkstra destino) {
+        List<Ciudad> ciudades = new ArrayList<>();
+        List<Arista> aristas = new ArrayList<>();
+
+        NodoDijkstra actual = destino;
+        while (actual != null) {
+            ciudades.add(0, actual.ciudad);
+            if (actual.aristaAnterior != null) {
+                aristas.add(0, actual.aristaAnterior);
+            }
+            actual = actual.anterior;
+        }
+
+        return new Itinerario(ciudades, aristas, destino.tiempo, destino.precio);
+    }
+
 
 }
