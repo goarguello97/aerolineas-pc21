@@ -3,6 +3,9 @@ package org.siglo21.estructuras;
 
 import org.siglo21.vuelo.Reserva;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Árbol AVL para las reservas
  */
@@ -217,6 +220,30 @@ public class ArbolAVL {
             nodo = nodo.getIzquierdo();
         }
         return nodo;
+    }
+
+    /**
+     * Recorrido en orden (inorder)
+     */
+    public List<Reserva> inOrder(NodoAVL nodo) {
+        List<Reserva> reservas = new ArrayList<Reserva>();
+        inOrderRecursivo(raiz, reservas);
+        return reservas;
+    }
+
+    private void inOrderRecursivo(NodoAVL nodo, List<Reserva> reservas) {
+        if (nodo != null) {
+            inOrderRecursivo(nodo.getIzquierdo(), reservas);
+            reservas.add(nodo.getReserva());
+            inOrderRecursivo(nodo.getDerecho(), reservas);
+        }
+    }
+
+    /**
+     * Verifica si el árbol esta vacío
+     */
+    public boolean estaVacio() {
+        return raiz == null;
     }
 }
 
