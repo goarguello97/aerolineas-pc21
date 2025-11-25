@@ -119,8 +119,28 @@ public class ArbolAVL {
         return nodo;
     }
 
+    /**
+     * Busca reserva por clave/código de vuelo
+     */
+    public Reserva buscar(String clave) {
+        return buscarRecursivo(raiz, clave);
+    }
 
+    private Reserva buscarRecursivo(NodoAVL nodo, String clave) {
+        if (nodo == null) {
+            return null;
+        }
 
+        int comparacion = clave.compareTo(nodo.getClave());
+
+        if (comparacion < 0) {
+            return buscarRecursivo(nodo.getIzquierdo(), clave);
+        } else if (comparacion > 0) {
+            return buscarRecursivo(nodo.getDerecho(), clave);
+        } else {
+            return nodo.getReserva();
+        }
+    }
 }
 
 
