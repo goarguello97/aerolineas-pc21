@@ -141,6 +141,83 @@ public class ArbolAVL {
             return nodo.getReserva();
         }
     }
+
+    /**
+     * Elimina una reserva por clave/código
+     */
+    public void eliminar(String clave) {
+        raiz = null;
+    }
+
+    private NodoAVL eliminarRecursivo(NodoAVL nodo, String clave) {
+        if (nodo == null) {
+            return null;
+        }
+
+        int comparacion = clave.compareTo(nodo.getClave());
+
+        if (comparacion < 0) {
+            nodo.setIzquierdo(eliminarRecursivo(nodo.getIzquierdo(), clave));
+        } else if (comparacion > 0) {
+            nodo.setDerecho(eliminarRecursivo(nodo.getDerecho(), clave));
+        } else {
+            // Nodo a eliminar encontrado
+            if (nodo.getIzquierdo() == null) {
+                return nodo.getDerecho();
+            } else if (nodo.getDerecho() == null) {
+                return nodo.getIzquierdo();
+            }
+
+            // Nodo con dos hijos: obtener el sucesor inorden(mínimo del subárbol derecho)
+            NodoAVL sucesor = obtenerMinimo(nodo.getDerecho());
+
+            // Creamos un nuevo nodo con los datos del sucesor para mantener la estructura
+            String claveSucesor = sucesor.getClave();
+            Reserva reservaSucesor = buscar(claveSucesor);
+            nodo.setDerecho(eliminarRecursivo(nodo.getDerecho(), claveSucesor));
+
+            // Actualizamos los datos del nodo actual con los del sucesor
+            nodo.setClave(claveSucesor);
+            nodo.setReserva(reservaSucesor);
+
+        }
+
+        actualizarAltura(nodo);
+
+        int balance = factorDeBalance(nodo);
+
+        // Rotación izquierda-izquierda
+        if (balance > 1 && factorDeBalance(nodo.getIzquierdo()) >= 0) {
+            return rotarDerecha(nodo);
+        }
+
+        // Rotación izquierda-derecha
+        if (balance > 1 && factorDeBalance(nodo.getIzquierdo()) < 0) {
+            nodo.setIzquierdo(rotarIzquierda(nodo.getIzquierdo()));
+            return rotarDerecha(nodo);
+        }
+
+        // Rotación derecha-derecha
+        if (balance < -1 && factorDeBalance(nodo.getDerecho()) <= 0) {
+            return rotarIzquierda(nodo);
+        }
+
+        // Rotación derecha-izquierda
+        if (balance < -1 && factorDeBalance(nodo.getDerecho()) > 0) {
+            nodo.setDerecho(rotarDerecha(nodo.getDerecho()));
+            return rotarIzquierda(nodo);
+        }
+
+        return nodo;
+
+    }
+
+    private NodoAVL obtenerMinimo(NodoAVL nodo) {
+        while (nodo.getIzquierdo() != null) {
+            nodo = nodo.getIzquierdo();
+        }
+        return nodo;
+    }
 }
 
 
