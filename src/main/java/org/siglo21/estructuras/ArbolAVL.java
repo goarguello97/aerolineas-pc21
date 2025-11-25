@@ -1,6 +1,8 @@
 package org.siglo21.estructuras;
 
 
+import org.siglo21.vuelo.Reserva;
+
 /**
  * Árbol AVL para las reservas
  */
@@ -62,6 +64,61 @@ public class ArbolAVL {
 
         return nodoY;
     }
+
+    /**
+     * Insertar reserva
+     * Utiliza el metodo recursivo
+     */
+    public void insertar(String clave, Reserva reserva) {
+        raiz = insertarRecursivo(raiz, clave, reserva);
+    }
+
+    private NodoAVL insertarRecursivo(NodoAVL nodo, String clave, Reserva reserva) {
+
+        if (nodo == null) {
+            return new NodoAVL(clave, reserva);
+        }
+
+        int comparacion = clave.compareTo(nodo.getClave());
+
+        if (comparacion < 0) {
+            nodo.setIzquierdo(insertarRecursivo(nodo.getIzquierdo(), clave, reserva));
+        } else if (comparacion > 0) {
+            nodo.setDerecho(insertarRecursivo(nodo.getDerecho(), clave, reserva));
+        } else {
+            nodo.setReserva(reserva);
+            return nodo;
+        }
+
+        actualizarAltura(nodo);
+
+        int balance = factorDeBalance(nodo);
+
+        // Rotación izquierda-izquierda
+        if (balance > 1 && clave.compareTo(nodo.getIzquierdo().getClave()) < 0) {
+            return rotarDerecha(nodo);
+        }
+
+        // Rotación derecha-derecha
+        if (balance < -1 && clave.compareTo(nodo.getDerecho().getClave()) > 0) {
+            return rotarIzquierda(nodo);
+        }
+
+        // Rotación izquierda-derecha
+        if (balance > 1 && clave.compareTo(nodo.getIzquierdo().getClave()) > 0) {
+            nodo.setIzquierdo(rotarIzquierda(nodo.getIzquierdo()));
+            return rotarDerecha(nodo);
+        }
+
+        // Rotación derecha-izquierda
+        if (balance < -1 && clave.compareTo(nodo.getDerecho().getClave()) < 0) {
+            nodo.setDerecho(rotarDerecha(nodo.getDerecho()));
+            return rotarIzquierda(nodo);
+        }
+
+        return nodo;
+    }
+
 
 
 }
