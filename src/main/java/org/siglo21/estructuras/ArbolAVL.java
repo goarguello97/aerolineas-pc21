@@ -225,7 +225,7 @@ public class ArbolAVL {
     /**
      * Recorrido en orden (inorder)
      */
-    public List<Reserva> inOrder(NodoAVL nodo) {
+    public List<Reserva> inOrder() {
         List<Reserva> reservas = new ArrayList<Reserva>();
         inOrderRecursivo(raiz, reservas);
         return reservas;
